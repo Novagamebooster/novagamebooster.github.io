@@ -12,62 +12,6 @@
     <meta name="apple-mobile-web-app-title" content="NOVA">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* اصلاح تداخل لوگو در هدر */
-        .app-header .logo {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            font-size: 20px;
-            font-weight: 900;
-        }
-        .app-header .logo span {
-            color: #a855f7;
-        }
-
-        /* رفع چشمک زدن کارت‌های بازی */
-        .game-card {
-            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
-            will-change: transform;
-            cursor: pointer;
-        }
-        .game-card.active {
-            border-color: #a855f7 !important;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4) !important;
-        }
-
-        /* اصلاح استایل نوار پایین (Bottom Nav) */
-        .bottom-nav {
-            display: flex !important;
-            justify-content: space-around !important;
-            align-items: center !important;
-            background: rgba(15, 23, 42, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-            padding: 8px 16px !important;
-        }
-        .bottom-nav .nav-item {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 6px !important;
-            background: transparent !important;
-            border: none !important;
-            color: #94a3b8 !important;
-            font-size: 14px !important;
-            font-family: 'Vazirmatn', sans-serif !important;
-            padding: 8px 16px !important;
-            border-radius: 12px !important;
-            cursor: pointer !important;
-            width: 45% !important;
-        }
-        .bottom-nav .nav-item.active {
-            background: rgba(168, 85, 247, 0.15) !important;
-            color: #a855f7 !important;
-            font-weight: 700 !important;
-        }
-    </style>
 </head>
 <body data-theme="neon">
 
@@ -76,7 +20,6 @@
         <div class="splash-loader"></div>
     </div>
 
-    <!-- Header -->
     <header class="app-header">
         <div class="logo"><span>N</span>OVA</div>
         <div class="user-profile-badge" id="profileBadge">
@@ -85,7 +28,6 @@
         </div>
     </header>
 
-    <!-- Main Content Tabs -->
     <main class="content-area">
 
         <!-- TAB 1: BOOSTER -->
@@ -126,7 +68,7 @@
             </div>
         </section>
 
-        <!-- TAB 2: SETTINGS / PROFILE -->
+        <!-- TAB 2: SETTINGS -->
         <section id="tab-settings" class="tab-content">
             <div class="card">
                 <div class="section-title">
@@ -156,7 +98,6 @@
 
     </main>
 
-    <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <button class="nav-item active" data-tab="tab-booster">
             <span class="nav-icon">🚀</span>
@@ -196,19 +137,23 @@
             setupProfileActions();
         });
 
+        // انتخاب بازی بدون پرش و چشمک
         function setupGameSelection() {
             const grid = document.getElementById('gamesGrid');
             if (!grid) return;
 
-            grid.querySelectorAll('.game-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    grid.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    selectedGame = card.dataset.game;
-                });
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.game-card');
+                if (!card || card.classList.contains('active')) return;
+
+                const current = grid.querySelector('.game-card.active');
+                if (current) current.classList.remove('active');
+                card.classList.add('active');
+                selectedGame = card.dataset.game;
             });
         }
 
+        // ناوبری بین تب‌ها
         function setupNavigation() {
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.addEventListener('click', () => {
