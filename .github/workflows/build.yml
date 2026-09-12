@@ -10,18 +10,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout novagamebooster.github.io
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Prepare Workspace Directory
-        run: mkdir -p www
+        run: |
+          mkdir -p www
+          mkdir -p assets
 
       - name: Clone Full Nova-booster Assets
         run: |
           git clone https://github.com/Novagamebooster/Nova-booster.git temp_repo
           cp -r temp_repo/* www/ 2>/dev/null || true
           cp -r index.html www/ 2>/dev/null || true
-          cp -r *.css *.js assets www/ 2>/dev/null || true
+          cp -r *.css *.js www/ 2>/dev/null || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,12 +36,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Prepare Capacitor & Assets Tools
+      - name: Install Capacitor & Assets Generator
         run: |
           echo '{"name": "nova-game-booster", "version": "1.0.0", "private": true}' > package.json
           npm install @capacitor/cli@5.7.0 @capacitor/core@5.7.0 @capacitor/android@5.7.0 @capacitor/assets@3.0.5 --save-dev
 
-      - name: Generate Neon N Icon
+      - name: Generate Neon N Icon & Splash Assets
         run: |
           sudo apt-get update && sudo apt-get install -y librsvg2-bin
           cat << 'EOF' > icon.svg
@@ -67,9 +69,13 @@ jobs:
             <text x="512" y="640" font-family="sans-serif" font-weight="900" font-size="440" fill="url(#textGrad)" text-anchor="middle" filter="url(#glow)">N</text>
           </svg>
           EOF
-          rsvg-convert -w 1024 -h 1024 icon.svg -o icon.png
+          rsvg-convert -w 1024 -h 1024 icon.svg -o assets/icon-only.png
+          rsvg-convert -w 1024 -h 1024 icon.svg -o assets/icon-foreground.png
+          rsvg-convert -w 1024 -h 1024 icon.svg -o assets/icon.png
+          rsvg-convert -w 2732 -h 2732 icon.svg -o assets/splash.png
+          rsvg-convert -w 2732 -h 2732 icon.svg -o assets/splash-dark.png
 
-      - name: Initialize & Sync Capacitor with Assets
+      - name: Initialize Capacitor & Build Native Android Assets
         run: |
           npx cap init "Nova Game Booster" "com.novagamebooster.app" --web-dir www
           npx cap add android
