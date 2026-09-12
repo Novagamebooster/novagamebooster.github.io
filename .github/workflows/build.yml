@@ -18,13 +18,19 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Capacitor & Dependencies
+      - name: Create package.json if not exists
         run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          if [ ! -f package.json ]; then
+            echo '{"name": "nova-game-booster", "version": "1.0.0", "private": true}' > package.json
+          fi
+
+      - name: Install Capacitor CLI
+        run: npm install @capacitor/cli @capacitor/core @capacitor/android
+
+      - name: Initialize Capacitor App
+        run: |
           npx cap init "Nova Game Booster" "com.novagamebooster.app" --web-dir .
           npx cap add android
-          npx cap sync android
 
       - name: Setup Java JDK
         uses: actions/setup-java@v3
